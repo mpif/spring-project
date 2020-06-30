@@ -14,7 +14,7 @@
 	default-autowire="byName"> 
 
 	<!-- mvc controller -->
-    <context:component-scan base-package="com.le.jr.marketing.manager" />
+    <context:component-scan base-package="com.spring" />
 	<aop:aspectj-autoproxy proxy-target-class="true"/>
 	<context:annotation-config/>
 	

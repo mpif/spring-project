@@ -1,0 +1,17 @@
+<Configuration status="ERROR">
+    <Appenders>
+        <RollingFile name="sync-log" filePattern="D:/Logs/sync-log-%d{yyyy-MM-dd}.log" fileName="D:/Logs/sync-log.log" immediateFlush="true">
+            <PatternLayout pattern="[%-5p %l %t %d{yyyy-MM-dd HH:mm:ss,SSS}]  %m%n" />
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5MB"/>
+            </Policies>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.codefans" level="INFO" additivity="false">
+            <AppenderRef ref="sync-log" />
+        </Logger>
+    </Loggers>
+</Configuration>
