@@ -1,0 +1,10 @@
+bin/
+out/
+.idea/
+.myeclipse/
+.settings/
+classes/
+target/
+*.iml
+*.class
+*.iml

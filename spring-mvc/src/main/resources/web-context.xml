@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="
+	   	http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd ">
+
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.spring.springmvc" />
+
+	<bean id="propertyConfigurer"
+		  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:conf/${env}.properties</value>
+				<!--
+				<value>classpath:dataapi/jdbc-pt.properties</value>
+				-->
+			</list>
+		</property>
+	</bean>
+<!--
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			&lt;!&ndash; Json返回状态转换 &ndash;&gt;
+			<bean class="org.springframework.http.converter.json.GsonHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>-->
+
+	<!--
+	<import resource="classpath:env/${env}/spring-config-*.xml"/>
+	-->
+
+	<!-- 数据库配置 -->
+	<import resource="dao-context.xml" />
+
+
+	<!-- dubbo服务配置
+	<import resource="dubbo-provider.xml" />
+	<import resource="dubbo-consumer.xml" />
+ 	-->
+
+	<!-- MQ服务配置
+	<import resource="rocketmq-consumer.xml" />
+	-->
+
+</beans>
