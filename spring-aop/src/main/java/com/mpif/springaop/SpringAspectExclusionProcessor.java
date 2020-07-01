@@ -58,18 +58,36 @@ public class SpringAspectExclusionProcessor {
 //    @Pointcut("execution(* com.jd..*.*(..)) && !bean(dynmaicConfigurerService)")
 //    @Pointcut("execution(* com.jd.vip.plus.soa..*.*(..)) || execution(* com.jd.vip.plus.thirdpart..*.*(..)) || execution(* com.jd.vip.plus.service..*.*(..)) || execution(* com.jd.vip.plus.rest..*.*(..)) || execution(* com.jd.vip.plus.mobile..*.*(..)) || execution(* com.jd.vip.plus.controller..*.*(..)) || execution(* com.jd.vip.smc.mobile..*.*(..))")
 //    @Pointcut("within(com.jd..*)")
-    @Pointcut("cutAllPackages() && !cutDynamicService()")
+//    @Pointcut("cutAllPackages() && !cutDynamicService()")
+//    @Pointcut("cutAllPackages()")
+    @Pointcut("cutAllPackages() && !cutDynamicService() && !cutExcludedService()")
+//    @Pointcut("cutIncludedPackages() && cutServicePackages() && !cutDynamicService() && !cutExcludedService()")
     public void dynamicLogAspect() {
         //设置层切点
     }
 
-    @Pointcut("execution(* com.mpif..*.*(..))")
+    @Pointcut("execution(* com.mpif.springaop..*.*(..))")
     public void cutAllPackages() {
+
+    }
+
+    @Pointcut("execution(* com.mpif.springaop.included..*.*(..))")
+    public void cutIncludedPackages() {
+
+    }
+
+    @Pointcut("execution(* com.mpif.springaop.service..*.*(..))")
+    public void cutServicePackages() {
 
     }
 
     @Pointcut("execution(* com.mpif.springaop.DynamicConfigureService.*(..))")
     public void cutDynamicService() {
+
+    }
+
+    @Pointcut("execution(* com.mpif.springaop.excluded..*.*(..))")
+    public void cutExcludedService() {
 
     }
 
@@ -138,9 +156,11 @@ public class SpringAspectExclusionProcessor {
         StringBuffer sb = new StringBuffer();
         if(argsArr != null) {
             Object arg = null;
-            sb.append("入参[");
-            for(int i = 0; i < argsArr.length; i ++) {
-                sb.append("arg").append(i+1).append(":[").append(gson.toJson(arg)).append("], ");
+            if(argsArr.length > 0) {
+                sb.append("入参[");
+                for (int i = 0; i < argsArr.length; i++) {
+                    sb.append("arg").append(i + 1).append(":[").append(gson.toJson(arg)).append("], ");
+                }
             }
         }
         return sb.toString();

@@ -8,6 +8,9 @@
 package com.mpif.springaop;
 
 
+import com.mpif.springaop.excluded.ActivityController;
+import com.mpif.springaop.included.CouponController;
+import com.mpif.springaop.service.UserService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
@@ -29,15 +32,8 @@ public class ContainerMain {
 
     public void startup() {
 
-        System.getProperty("user.dir");
 
-        public static String OPEN_SOURCE_ROOT  = PROJECT_ROOT + File.separator + "open-source";
-
-        public static String OPEN_SOURCE_RESOURCES_ROOT  = OPEN_SOURCE_ROOT + File.separator + "src/main/resources";
-
-        public static String OPEN_SOURCE_RESOURCES_LOG4J  = OPEN_SOURCE_RESOURCES_ROOT + File.separator + "log4j";
-
-        String propFile = 
+        String propFile = System.getProperty("user.dir") + File.separator + "spring-aop" + File.separator + "src/main/resources" + File.separator + "log4j2.xml";
         //初始化方式1
         System.setProperty("log4j.configurationFile", propFile);
 
@@ -46,13 +42,29 @@ public class ContainerMain {
         TestController testController = (TestController) applicationContext.getBean("testController");
         testController.test01();
 
-        while(true) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        UserService userService = (UserService) applicationContext.getBean("userService");
+        String userId = "30003";
+        String userInfo = userService.queryName(userId);
+        System.out.println("userId=" + userId + ", userInfo=" + userInfo);
+
+
+        ActivityController activityController = (ActivityController) applicationContext.getBean("activityController");
+        String activityId = "10001";
+        String activityContent = activityController.queryActivity(activityId);
+        System.out.println("activityId=" + activityId + ", activityContent=" + activityContent);
+
+        CouponController couponController = (CouponController) applicationContext.getBean("couponController");
+        activityId = "20003";
+        String couponInfo = couponController.queryCouponList(activityId);
+        System.out.println("activityId=" + activityId + ", couponInfo=" + couponInfo);
+
+//        while(true) {
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
     }
 

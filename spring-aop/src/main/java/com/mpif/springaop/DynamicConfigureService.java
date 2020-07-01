@@ -34,7 +34,7 @@ public class DynamicConfigureService {
      * @return
      */
     public String dynamicLogMethodConfig() {
-        return "com.mpif.springaop.TestController.test01";
+        return "com.mpif.springaop.TestController.test01;com.mpif.springaop.included.CouponController.queryCouponList;";
     }
 
 }

@@ -10,7 +10,7 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="com.codefans" level="INFO" additivity="false">
+        <Logger name="com.mpif" level="INFO" additivity="false">
             <AppenderRef ref="sync-log" />
         </Logger>
     </Loggers>
