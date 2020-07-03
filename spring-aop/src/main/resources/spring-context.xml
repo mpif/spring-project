@@ -14,12 +14,43 @@
 		http://www.springframework.org/schema/mvc
 		http://www.springframework.org/schema/mvc/spring-mvc.xsd ">
 
-
 	<context:annotation-config />
 	<context:component-scan base-package="com.mpif.springaop" />
 
-	<!-- aspectj -->
-	<aop:aspectj-autoproxy proxy-target-class="true"/>
+	<!--
+	<aop:aspectj-autoproxy proxy-target-class="true" >
+		<aop:include name="differentAdvicePointcut" />
+	</aop:aspectj-autoproxy>
+	-->
+
+	<aop:config>
+		<!-- 配置切入点表达式:哪些类的哪些方法需要进行增强 -->
+		<aop:pointcut  expression="this(com.mpif.springaop.DifferentAdvicePointcut)" id="differentAdvicePointcut"/>
+		<!-- 配置切面 -->
+		<aop:aspect ref="differentAdviceProcessor">
+			<aop:before method="doBefore" pointcut-ref="differentAdvicePointcut"/>
+			<aop:after-returning method="doAfterReturning" pointcut-ref="differentAdvicePointcut"/>
+			<aop:around method="doAround" pointcut-ref="differentAdvicePointcut"/>
+			<aop:after-throwing method="doAfterThrowing" pointcut-ref="differentAdvicePointcut"/>
+			<aop:after method="doAfter" pointcut-ref="differentAdvicePointcut"/>
+		</aop:aspect>
+	</aop:config>
+
+	<aop:config>
+		<!-- 配置切入点表达式:哪些类的哪些方法需要进行增强 -->
+		<aop:pointcut expression="cutAllPackages() and !cutDynamicService() and !cutExcludedService()" id="dynamicLogAspect" />
+		<aop:pointcut expression="execution(* com.mpif.springaop..*.*(..))" id="cutAllPackages"/>
+		<aop:pointcut expression="execution(* com.mpif.springaop.DynamicConfigureService.*(..))" id="cutDynamicService"/>
+		<aop:pointcut expression="execution(* com.mpif.springaop.excluded..*.*(..))" id="cutExcludedService"/>
+		<!-- 配置切面 -->
+		<aop:aspect ref="springAspectExclusionProcessor">
+			<aop:before method="doBefore" pointcut-ref="dynamicLogAspect"/>
+			<aop:after-returning method="doAfterReturning" pointcut-ref="dynamicLogAspect"/>
+			<aop:around method="doAround" pointcut-ref="dynamicLogAspect"/>
+			<aop:after-throwing method="doAfterThrowing" pointcut-ref="dynamicLogAspect"/>
+			<aop:after method="doAfter" pointcut-ref="dynamicLogAspect"/>
+		</aop:aspect>
+	</aop:config>
 
 
 </beans>

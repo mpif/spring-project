@@ -9,17 +9,19 @@ package com.mpif.springaop;
 
 import com.google.gson.Gson;
 import com.mpif.springaop.util.StringUtil;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 /**
@@ -71,12 +73,14 @@ public class SpringAspectExclusionProcessor {
 
     }
 
-    @Pointcut("execution(* com.mpif.springaop.included..*.*(..))")
+//    @Pointcut("execution(* com.mpif.springaop.included..*.*(..))")
+    @Pointcut("within(com.mpif.springaop.included..*)")
     public void cutIncludedPackages() {
 
     }
 
-    @Pointcut("execution(* com.mpif.springaop.service..*.*(..))")
+//    @Pointcut("execution(* com.mpif.springaop.service..*.*(..))")
+    @Pointcut("within(com.mpif.springaop.service..*)")
     public void cutServicePackages() {
 
     }
@@ -89,6 +93,31 @@ public class SpringAspectExclusionProcessor {
     @Pointcut("execution(* com.mpif.springaop.excluded..*.*(..))")
     public void cutExcludedService() {
 
+    }
+
+    @Before("dynamicLogAspect()")
+    public Object doBefore(JoinPoint joinPoint) {
+        Object obj = null;
+        Class[] paramTypes = null;
+
+        try {
+            MethodSignature methodSignature = null;
+            Signature signature = joinPoint.getSignature();
+            if(signature instanceof MethodSignature) {
+                methodSignature = (MethodSignature) signature;
+            }
+            if(methodSignature != null) {
+                Method method = methodSignature.getMethod();
+                paramTypes = methodSignature.getParameterTypes();
+
+                String paramStr = this.generateArgs(joinPoint.getArgs(), paramTypes);
+                System.out.println("doBefore--->paramStr:" + paramStr);
+            }
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+
+        return obj;
     }
 
     /**
@@ -109,7 +138,11 @@ public class SpringAspectExclusionProcessor {
 
         Object obj = null;
         boolean needPrintLog = false;
-        String currentMethodFullName = "";
+        String fullName = "";
+        String className = "";
+        String methodName = "";
+        Class[] paramTypes = null;
+
         try {
 
             String dynamicLogMethodConfig = dynamicConfigureService.dynamicLogMethodConfig();
@@ -121,14 +154,14 @@ public class SpringAspectExclusionProcessor {
             }
             if(methodSignature != null) {
                 Method method = methodSignature.getMethod();
+                paramTypes = methodSignature.getParameterTypes();
 
-                StringBuffer sb = new StringBuffer();
-                currentMethodFullName = sb.append(method.getDeclaringClass().getCanonicalName()).append(".").append(method.getName()).toString();
+                className = StringUtil.append(method.getDeclaringClass().getCanonicalName()).toString();
+                methodName = method.getName();
+                fullName = StringUtil.append(className).append(".").append(methodName).toString();
 
-                if(dynamicLogMethodConfig != null && dynamicLogMethodConfig.contains(currentMethodFullName)) {
-                    needPrintLog = true;
-                }
-                LOG.info("dynamicLogMethodConfig={}, currentMethodFullName={}, needPrintLog={}", dynamicLogMethodConfig, currentMethodFullName, needPrintLog);
+                needPrintLog = this.needPrintLog(dynamicLogMethodConfig, fullName, className);
+                LOG.info("dynamicLogMethodConfig={}, fullName={}, needPrintLog={}", dynamicLogMethodConfig, fullName, needPrintLog);
 
                 obj = pjp.proceed();
 
@@ -141,25 +174,76 @@ public class SpringAspectExclusionProcessor {
         }
 
         if(needPrintLog) {
-            printLog(currentMethodFullName, this.generateArgs(pjp.getArgs()), obj);
+            printLog(fullName, this.generateArgs(pjp.getArgs(), paramTypes), obj);
         }
 
         return obj;
     }
 
+    @After("dynamicLogAspect()")
+    public Object doAfter(JoinPoint joinPoint) {
+        System.out.println("doAfter");
+        return null;
+    }
+
+    @AfterReturning("dynamicLogAspect()")
+    public Object doAfterReturning(JoinPoint joinPoint) {
+        System.out.println("doAfterReturning");
+        return null;
+    }
+
+    @AfterThrowing("dynamicLogAspect()")
+    public Object doAfterThrowing(JoinPoint joinPoint) {
+        System.out.println("doAfterThrowing");
+        return null;
+    }
+
+    /**
+     * 判断是否需要打印日志
+     * @param dynamicLogMethodConfig
+     * @param fullName
+     * @param className
+     * @return
+     */
+    private boolean needPrintLog(String dynamicLogMethodConfig, String fullName, String className) {
+        boolean needPrintLog = false;
+        if(!StringUtils.isEmpty(dynamicLogMethodConfig)) {
+
+            /**
+             * 如果配置的是类
+             */
+//            if(dynamicLogMethodConfig.contains(className)) {
+//                needPrintLog = true;
+//            }
+            /**
+             * 如果配置的是方法
+             */
+            if(dynamicLogMethodConfig.contains(fullName)) {
+                needPrintLog = true;
+            }
+        }
+        return needPrintLog;
+    }
 
     /**
      * 打印入参
      * @param argsArr
      */
-    public String generateArgs(Object[] argsArr) {
+    public String generateArgs(Object[] argsArr, Class[] paramTypes) {
         StringBuffer sb = new StringBuffer();
         if(argsArr != null) {
-            Object arg = null;
+            Object arg;
             if(argsArr.length > 0) {
-                sb.append("入参[");
                 for (int i = 0; i < argsArr.length; i++) {
-                    sb.append("arg").append(i + 1).append(":[").append(gson.toJson(arg)).append("], ");
+                    arg = argsArr[i];
+                    if(i != 0) {
+                        sb.append(", ");
+                    }
+//                    if(arg instanceof HttpServletRequest || arg instanceof HttpServletResponse) {
+//                        continue;
+//                    }
+//                    sb.append("arg").append(i + 1).append(":[").append(arg.getClass()).append(".").append(paramTypes[i]).append(".").append(JSON.toJSON(arg)).append("]");
+                    sb.append("arg").append(i + 1).append(":[").append(gson.toJson(arg)).append("]");
                 }
             }
         }

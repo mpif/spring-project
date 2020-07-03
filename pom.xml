@@ -19,6 +19,11 @@
         <spring.version>4.3.27.RELEASE</spring.version>
         <org.aspectj.version>1.9.1</org.aspectj.version>
         <aspectjweaver.version>1.9.1</aspectjweaver.version>
+        <!--
+        <org.aspectj.version>1.9.5</org.aspectj.version>
+        <aspectjweaver.version>1.9.5</aspectjweaver.version>
+        -->
+        <javax.servlet.version>3.1.0</javax.servlet.version>
     </properties>
 
     <dependencyManagement>
@@ -182,6 +187,13 @@
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>2.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${javax.servlet.version}</version>
+                <scope>provided</scope>
             </dependency>
 
         </dependencies>

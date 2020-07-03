@@ -1,17 +1,20 @@
 <Configuration status="ERROR">
     <Appenders>
         <RollingFile name="sync-log" filePattern="D:/Logs/sync-log-%d{yyyy-MM-dd}.log" fileName="D:/Logs/sync-log.log" immediateFlush="true">
-            <PatternLayout pattern="[%-5p %l %t %d{yyyy-MM-dd HH:mm:ss,SSS}]  %m%n" />
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %t %l -> %m%n" />
             <Policies>
                 <SizeBasedTriggeringPolicy size="5MB"/>
             </Policies>
         </RollingFile>
-
+        <Console name="consoleAppender">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %t %l -> %m%n" />
+        </Console>
     </Appenders>
 
     <Loggers>
         <Logger name="com.mpif" level="INFO" additivity="false">
             <AppenderRef ref="sync-log" />
+            <AppenderRef ref="consoleAppender" />
         </Logger>
     </Loggers>
 </Configuration>

@@ -14,6 +14,8 @@ import com.mpif.springaop.service.UserService;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -55,7 +57,11 @@ public class ContainerMain {
 
         CouponController couponController = (CouponController) applicationContext.getBean("couponController");
         activityId = "20003";
-        String couponInfo = couponController.queryCouponList(activityId);
+        List<String> couponIdList = new ArrayList<>();
+        couponIdList.add("couponId001");
+        couponIdList.add("couponId002");
+        couponIdList.add("couponId003");
+        String couponInfo = couponController.queryCouponList(activityId, couponIdList);
         System.out.println("activityId=" + activityId + ", couponInfo=" + couponInfo);
 
 //        while(true) {
