@@ -16,7 +16,7 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.27.RELEASE</spring.version>
+        <spring.version>5.2.20.RELEASE</spring.version>
         <org.aspectj.version>1.9.1</org.aspectj.version>
         <aspectjweaver.version>1.9.1</aspectjweaver.version>
         <!--
